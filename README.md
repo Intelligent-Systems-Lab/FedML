@@ -16,6 +16,13 @@
    <a href="https://opencollective.com/fedml#support" target="_blank"><img src="https://opencollective.com/fedml/tiers/sponsors.svg?avatarHeight=36"></a>
 </p>
 
+## For ISL lab
+
+使用Git Submodule 來將ISL FedML 加到自己的 repo中，可一邊開發自己的repo，一邊新增功能到ISL FedML 中。
+實驗可行後，再由ISL FedML 發PR
+
+參考： [Git 進階應用 Submodule 與 Subtree，使用它們來拆分專案](https://blog.puckwang.com/post/2020/git-submodule-vs-subtree/#%E6%96%B0%E5%A2%9E-submodule)
+
 ## News
 <b>2021-02-01 (Award)</b>: #NeurIPS 2020# FedML won <a href="https://chaoyanghe.com/wp-content/uploads/2021/02/NeurIPS-SpicyFL-2020-Baidu-best-paper-award-He-v2.pdf">Best Paper Award</a> at NeurIPS Federated Learning workshop 2020
 
