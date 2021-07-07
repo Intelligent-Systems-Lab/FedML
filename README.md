@@ -21,6 +21,20 @@
 使用Git Submodule 來將ISL FedML 加到自己的 repo中，可一邊開發自己的repo，一邊新增功能到ISL FedML 中。
 實驗可行後，再由ISL FedML 發PR
 
+Add sub-repo
+```
+git submodule add -f https://github.com/Intelligent-Systems-Lab/FedML.git FedML
+```
+
+In your code
+```python
+import sys
+sys.path.insert(0, os.path.abspath(os.path.join(os.getcwd(), "../"))) # path to repo folder 
+from FedML.fedml_api.model.cv.resnet import resnet56
+```
+
+
+
 參考： [Git 進階應用 Submodule 與 Subtree，使用它們來拆分專案](https://blog.puckwang.com/post/2020/git-submodule-vs-subtree/#%E6%96%B0%E5%A2%9E-submodule)
 
 ## News
