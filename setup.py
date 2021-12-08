@@ -6,10 +6,10 @@ with open("README.md", "r", encoding="utf-8") as fh:
 setup(
     name="FedML",
     url="https://github.com/FedML-AI/FedML",
-    packages=['fedml_api', 'fedml_core', 'fedml_experiments'],
-    package_data={'fedml_api': ['*'],
-                  'fedml_core': ['*'],
-                  'fedml_experiments': ['*']},
+    # packages=['fedml_api', 'fedml_core', 'fedml_experiments'],
+    package_data={'fedml_api': 'fedml_api/**/*',
+                  'fedml_core': 'fedml_core/**/*',
+                  'fedml_experiments': 'fedml_experiments/**/*'},
     include_package_data=True,
     python_requires=">=3.6",
 
