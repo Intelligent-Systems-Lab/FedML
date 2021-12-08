@@ -16,6 +16,14 @@
    <a href="https://opencollective.com/fedml#support" target="_blank"><img src="https://opencollective.com/fedml/tiers/sponsors.svg?avatarHeight=36"></a>
 </p>
 
+## For isl lab 
+
+Use this command to install packages ``fedml_api`` ``fedml_core`` ``fedml_experiments``
+```shell
+pip3 install git+https://github.com/Intelligent-Systems-Lab/FedML
+```
+
+
 ## News
 <b>2021-02-01 (Award)</b>: #NeurIPS 2020# FedML won <a href="https://chaoyanghe.com/wp-content/uploads/2021/02/NeurIPS-SpicyFL-2020-Baidu-best-paper-award-He-v2.pdf">Best Paper Award</a> at NeurIPS Federated Learning workshop 2020
 
