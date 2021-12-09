@@ -8,9 +8,12 @@ import wandb
 
 from fedml_api.standalone.fedavg.client import Client
 
+from concurrent.futures import as_completed
+from concurrent.futures import ThreadPoolExecutor
+
 
 class FedAvgAPI(object):
-    def __init__(self, dataset, device, args, model_trainer):
+    def __init__(self, dataset, device, args, model_trainer, threading=None):
         self.device = device
         self.args = args
         [train_data_num, test_data_num, train_data_global, test_data_global,
@@ -29,11 +32,15 @@ class FedAvgAPI(object):
         self.model_trainer = model_trainer
         self._setup_clients(train_data_local_num_dict, train_data_local_dict, test_data_local_dict, model_trainer)
 
+        # isl
+        self.threading = threading
+
     def _setup_clients(self, train_data_local_num_dict, train_data_local_dict, test_data_local_dict, model_trainer):
         logging.info("############setup_clients (START)#############")
         for client_idx in range(self.args.client_num_per_round):
             c = Client(client_idx, train_data_local_dict[client_idx], test_data_local_dict[client_idx],
-                       train_data_local_num_dict[client_idx], self.args, self.device, model_trainer)
+                       train_data_local_num_dict[client_idx], self.args, self.device, copy.deepcopy(model_trainer))
+            c.model_trainer.id = client_idx
             self.client_list.append(c)
         logging.info("############setup_clients (END)#############")
 
@@ -51,23 +58,43 @@ class FedAvgAPI(object):
             """
             client_indexes = self._client_sampling(round_idx, self.args.client_num_in_total,
                                                    self.args.client_num_per_round)
-            logging.info("client_indexes = " + str(client_indexes))
+            # logging.info("client_indexes = " + str(client_indexes))
 
-            for idx, client in enumerate(self.client_list):
-                # update dataset
-                client_idx = client_indexes[idx]
-                client.update_local_dataset(client_idx, self.train_data_local_dict[client_idx],
-                                            self.test_data_local_dict[client_idx],
-                                            self.train_data_local_num_dict[client_idx])
+            if self.threading is None:
+                for idx, client in enumerate(self.client_list):
+                    if idx not in client_indexes:
+                        continue
+                    # update dataset
+                    # client_idx = client_indexes[idx]
+                    # client.update_local_dataset(client_idx, self.train_data_local_dict[client_idx],
+                    #                             self.test_data_local_dict[client_idx],
+                    #                             self.train_data_local_num_dict[client_idx])
 
-                # train on new dataset
-                w = client.train(copy.deepcopy(w_global))
-                # self.logger.info("local weights = " + str(w))
-                w_locals.append((client.get_sample_number(), copy.deepcopy(w)))
+                    # train on new dataset
+                    w = client.train(copy.deepcopy(w_global))
+                    # self.logger.info("local weights = " + str(w))
+                    w_locals.append((client.get_sample_number(), copy.deepcopy(w)))
+            else:
+                with ThreadPoolExecutor(max_workers=self.threading) as executor:
+                    futures = []
+                    for idx, client in enumerate(self.client_list):
+                        if idx not in client_indexes:
+                            continue
+                        future = executor.submit(client.train, copy.deepcopy(w_global))
+
+                        futures.append(future)
+
+                    for future in as_completed(futures):
+                        w_locals.append(future.result())
+                    del futures
 
             # update global weights
             w_global = self._aggregate(w_locals)
             self.model_trainer.set_model_params(w_global)
+
+            # update clients' weight
+            for c in self.client_list:
+                c.model_trainer.set_model_params(w_global)
 
             # test results
             # at last round
