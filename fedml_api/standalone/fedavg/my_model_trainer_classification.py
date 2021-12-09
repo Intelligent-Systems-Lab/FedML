@@ -24,8 +24,8 @@ class MyModelTrainer(ModelTrainer):
 
         if self.scheduler is not None:
             self.scheduler.step()
-            args.lr = self.scheduler.get_lr()
-            print(args.lr)
+            args.lr = self.scheduler.get_lr()[0]
+            # print(args.lr)
 
         # train and update
         criterion = nn.CrossEntropyLoss().to(device)

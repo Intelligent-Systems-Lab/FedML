@@ -208,6 +208,9 @@ class FedAvgAPI(object):
         wandb.log({"Test/Loss": test_loss, "round": round_idx})
         logging.info(stats)
 
+        # upload lr
+        wandb.log({"LR": self.client_list[0].model_trainer.scheduler.get_lr()[0], "round": round_idx})
+
     def _local_test_on_validation_set(self, round_idx):
 
         logging.info("################local_test_on_validation_set : {}".format(round_idx))
