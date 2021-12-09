@@ -8,10 +8,11 @@ class ModelTrainer(ABC):
        2. This class can be used in both server and client side
        3. This class is an operator which does not cache any states inside.
     """
-    def __init__(self, model, args=None):
+    def __init__(self, model, scheduler=None, args=None):
         self.model = model
         self.id = 0
         self.args = args
+        self.scheduler = scheduler
 
     def set_id(self, trainer_id):
         self.id = trainer_id

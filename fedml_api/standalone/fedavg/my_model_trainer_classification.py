@@ -22,6 +22,11 @@ class MyModelTrainer(ModelTrainer):
         model.to(device)
         model.train()
 
+        if self.scheduler is not None:
+            self.scheduler.step()
+            args.lr = self.scheduler.get_lr()
+            print(args.lr)
+
         # train and update
         criterion = nn.CrossEntropyLoss().to(device)
         if args.client_optimizer == "sgd":
@@ -29,6 +34,9 @@ class MyModelTrainer(ModelTrainer):
         else:
             optimizer = torch.optim.Adam(filter(lambda p: p.requires_grad, self.model.parameters()), lr=args.lr,
                                          weight_decay=args.wd, amsgrad=True)
+
+        if self.scheduler is not None:
+            self.scheduler.step()
 
         epoch_loss = []
         for epoch in range(args.epochs):

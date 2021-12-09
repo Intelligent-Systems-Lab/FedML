@@ -271,7 +271,7 @@ def custom_model_trainer(args, model):
         return MyModelTrainerTAG(model)
     elif args.dataset in ["fed_shakespeare", "stackoverflow_nwp"]:
         return MyModelTrainerNWP(model)
-    else: # default model trainer is for classification problem
+    else:  # default model trainer is for classification problem
         return MyModelTrainerCLS(model)
 
 
@@ -309,6 +309,14 @@ if __name__ == "__main__":
     # In this case, please use our FedML distributed version (./fedml_experiments/distributed_fedavg)
     model = create_model(args, model_name=args.model, output_dim=dataset[7])
     model_trainer = custom_model_trainer(args, model)
+
+    headless_opt = torch.optim.SGD(model.parameters(), lr=1e-5)
+    model_trainer = MyModelTrainerCLS(model,
+                                      scheduler=torch.optim.lr_scheduler.CosineAnnealingLR(optimizer=headless_opt,
+                                                                                           T_max=args.lr,
+                                                                                           eta_min=10e-6,
+                                                                                           last_epoch=args.epochs-10))
+
     logging.info(model)
 
     fedavgAPI = FedAvgAPI(dataset, device, args, model_trainer)
