@@ -14,6 +14,7 @@ class Client:
         self.args = args
         self.device = device
         self.model_trainer = model_trainer
+        self.weights = None
 
     def update_local_dataset(self, client_idx, local_training_data, local_test_data, local_sample_number):
         self.client_idx = client_idx
@@ -27,8 +28,8 @@ class Client:
     def train(self, w_global):
         self.model_trainer.set_model_params(w_global)
         self.model_trainer.train(self.local_training_data, self.device, self.args)
-        weights = self.model_trainer.get_model_params()
-        return weights
+        self.weights = self.model_trainer.get_model_params()
+        return self.weights
 
     def local_test(self, b_use_test_dataset):
         if b_use_test_dataset:

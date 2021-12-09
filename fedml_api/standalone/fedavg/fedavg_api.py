@@ -81,12 +81,14 @@ class FedAvgAPI(object):
                         if idx not in client_indexes:
                             continue
                         future = executor.submit(client.train, copy.deepcopy(w_global))
-
                         futures.append(future)
-
                     for future in as_completed(futures):
-                        w_locals.append(future.result())
+                        pass
                     del futures
+                    for idx, client in enumerate(self.client_list):
+                        if idx not in client_indexes:
+                            continue
+                        w_locals.append((client.get_sample_number(), copy.deepcopy(client.weights)))
 
             # update global weights
             w_global = self._aggregate(w_locals)
