@@ -13,7 +13,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 
 class FedAvgAPI(object):
-    def __init__(self, dataset, device, args, model_trainer, threading=None):
+    def __init__(self, dataset, device, args, model_trainer, threading=None, scheduler=None):
         self.device = device
         self.args = args
         [train_data_num, test_data_num, train_data_global, test_data_global,
@@ -34,6 +34,7 @@ class FedAvgAPI(object):
 
         # isl
         self.threading = threading
+        self.scheduler = scheduler
 
     def _setup_clients(self, train_data_local_num_dict, train_data_local_dict, test_data_local_dict, model_trainer):
         logging.info("############setup_clients (START)#############")
@@ -59,6 +60,11 @@ class FedAvgAPI(object):
             client_indexes = self._client_sampling(round_idx, self.args.client_num_in_total,
                                                    self.args.client_num_per_round)
             # logging.info("client_indexes = " + str(client_indexes))
+
+            # update lr
+            if self.scheduler is not None:
+                for c in self.client_list:
+                    c.args.lr = self.scheduler.get_lr()
 
             if self.threading is None:
                 for idx, client in enumerate(self.client_list):
@@ -108,6 +114,9 @@ class FedAvgAPI(object):
                     self._local_test_on_validation_set(round_idx)
                 else:
                     self._local_test_on_all_clients(round_idx)
+
+            if self.model_trainer.scheduler is not None:
+                self.scheduler.step()
 
     def _client_sampling(self, round_idx, client_num_in_total, client_num_per_round):
         if client_num_in_total == client_num_per_round:
@@ -209,7 +218,7 @@ class FedAvgAPI(object):
         logging.info(stats)
 
         # upload lr
-        wandb.log({"LR": self.client_list[0].model_trainer.scheduler.get_lr()[0], "round": round_idx})
+        wandb.log({"LR": self.scheduler.get_lr(), "round": round_idx})
 
     def _local_test_on_validation_set(self, round_idx):
 
