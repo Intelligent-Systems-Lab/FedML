@@ -64,7 +64,7 @@ class FedAvgAPI(object):
             # update lr
             if self.scheduler is not None:
                 for c in self.client_list:
-                    c.args.lr = self.scheduler.get_lr()
+                    c.args.lr = self.scheduler.get_lr()[0]
 
             if self.threading is None:
                 for idx, client in enumerate(self.client_list):
@@ -218,7 +218,8 @@ class FedAvgAPI(object):
         logging.info(stats)
 
         # upload lr
-        wandb.log({"LR": self.scheduler.get_lr(), "round": round_idx})
+        LR = self.args.lr if self.scheduler is None else self.scheduler.get_lr()[0]
+        wandb.log({"LR": LR, "round": round_idx})
 
     def _local_test_on_validation_set(self, round_idx):
 
