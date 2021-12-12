@@ -115,7 +115,7 @@ class FedAvgAPI(object):
                 else:
                     self._local_test_on_all_clients(round_idx)
 
-            if self.model_trainer.scheduler is not None:
+            if self.scheduler is not None:
                 self.scheduler.step()
 
     def _client_sampling(self, round_idx, client_num_in_total, client_num_per_round):
