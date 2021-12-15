@@ -6,10 +6,14 @@ from typing import List
 
 import paho.mqtt.client as mqtt
 
-from FedML.fedml_core.distributed.communication.base_com_manager import BaseCommunicationManager
-from FedML.fedml_core.distributed.communication.message import Message
-from FedML.fedml_core.distributed.communication.observer import Observer
-
+try:
+    from FedML.fedml_core.distributed.communication.base_com_manager import BaseCommunicationManager
+    from FedML.fedml_core.distributed.communication.message import Message
+    from FedML.fedml_core.distributed.communication.observer import Observer
+except ImportError:
+    from fedml_core.distributed.communication.base_com_manager import BaseCommunicationManager
+    from fedml_core.distributed.communication.message import Message
+    from fedml_core.distributed.communication.observer import Observer
 
 class MqttCommManager(BaseCommunicationManager):
     def __init__(self, host, port, topic='fedml', client_id=0, client_num=0):
